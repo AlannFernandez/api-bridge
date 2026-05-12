@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Zap, Globe, FileCode, ArrowRightLeft, GripVertical, Plus, Trash2 } from "lucide-react";
+import { Zap, Globe, FileCode, ArrowRightLeft, GripVertical, Plus, Trash2, Lock } from "lucide-react";
 import { useNodeTest } from "@/components/editor/node-test-context";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +9,13 @@ import { Button } from "@/components/ui/button";
 
 interface DraggableItemProps {
   type: string;
+  label: string;
+  icon: React.ReactNode;
+  color: string;
+  enabled?: boolean;
+}
+
+interface DisabledItemProps {
   label: string;
   icon: React.ReactNode;
   color: string;
@@ -34,6 +41,24 @@ function DraggableItem({ type, label, icon, color }: DraggableItemProps) {
         {icon}
       </div>
       <span className="text-sm font-medium text-zinc-300">{label}</span>
+    </div>
+  );
+}
+
+function DisabledItem({ label, icon, color }: DisabledItemProps) {
+  return (
+    <div className="flex cursor-not-allowed items-center gap-3 rounded-lg border border-zinc-800 bg-zinc-950/50 px-3 py-2.5 opacity-50">
+      <Lock className="h-4 w-4 text-zinc-600" />
+      <div
+        className="flex h-8 w-8 items-center justify-center rounded-md"
+        style={{ backgroundColor: `${color}20` }}
+      >
+        {icon}
+      </div>
+      <div className="flex flex-1 flex-col">
+        <span className="text-sm font-medium text-zinc-500">{label}</span>
+        <span className="text-[10px] text-zinc-600">Coming soon</span>
+      </div>
     </div>
   );
 }
@@ -70,6 +95,7 @@ export function Sidebar() {
           label: "Webhook",
           icon: <Zap className="h-4 w-4 text-emerald-400" />,
           color: "#10b981",
+          enabled: true,
         },
       ],
     },
@@ -81,12 +107,35 @@ export function Sidebar() {
           label: "REST API",
           icon: <Globe className="h-4 w-4 text-blue-400" />,
           color: "#3b82f6",
+          enabled: true,
         },
         {
           type: "integration-soap",
           label: "SOAP Service",
           icon: <FileCode className="h-4 w-4 text-purple-400" />,
           color: "#a855f7",
+          enabled: true,
+        },
+        {
+          type: "integration-graphql",
+          label: "GraphQL",
+          icon: <Globe className="h-4 w-4 text-pink-400" />,
+          color: "#ec4899",
+          enabled: false,
+        },
+        {
+          type: "integration-grpc",
+          label: "gRPC",
+          icon: <FileCode className="h-4 w-4 text-cyan-400" />,
+          color: "#06b6d4",
+          enabled: false,
+        },
+        {
+          type: "integration-socket",
+          label: "WebSocket",
+          icon: <Zap className="h-4 w-4 text-orange-400" />,
+          color: "#f97316",
+          enabled: false,
         },
       ],
     },
@@ -98,6 +147,7 @@ export function Sidebar() {
           label: "Data Transform",
           icon: <ArrowRightLeft className="h-4 w-4 text-amber-400" />,
           color: "#f59e0b",
+          enabled: true,
         },
       ],
     },
@@ -120,7 +170,11 @@ export function Sidebar() {
               </h3>
               <div className="space-y-2">
                 {group.items.map((item) => (
-                  <DraggableItem key={item.type} {...item} />
+                  item.enabled ? (
+                    <DraggableItem key={item.type} {...item} />
+                  ) : (
+                    <DisabledItem key={item.type} label={item.label} icon={item.icon} color={item.color} />
+                  )
                 ))}
               </div>
             </div>
